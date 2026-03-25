@@ -1,4 +1,5 @@
 #include "Squad.h"
+#include<iostream>
 
 Warrior* Squad::recruit(string name, string cls, int atk, int def, int hp, int maxSkills)
 {
@@ -12,11 +13,38 @@ bool Squad::dismiss(string name)
 
 float Squad::totalPower() const
 {
-	return 0.0f;
+    float total = 0.0f;
+
+    for (int i = 0; i < count; i++)
+    {
+        total += warriors[i]->getPower();
+    }
+
+    return total;
 }
 
 void Squad::showSquad() const
+
 {
+    cout << "-----------------------------" << endl;
+    cout << "=========== SQUAD ===========" << endl;
+    cout << "-----------------------------" << endl;
+    cout << "Name: " << name << endl;
+    cout << "Warriors: " << count << endl;
+
+    cout << "\n--- Warrior List ---" << endl;
+
+    for (int i = 0; i < count; i++)
+    {
+        cout << "\nWarrior #" << (i + 1) << endl;
+        warriors[i]->show();
+    }
+
+    cout << "\n----------------" << endl;
+    cout << "Total Power: " << totalPower() << endl;
+    cout << "-----------------------------" << endl;
+    cout << "=========== FINISH ===========" << endl;
+    cout << "-----------------------------" << endl;
 }
 
 int Squad::getCount() const
