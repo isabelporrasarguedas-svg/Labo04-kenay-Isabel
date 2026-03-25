@@ -3,24 +3,50 @@
 
 Warrior* Squad::recruit(string name, string cls, int atk, int def, int hp, int maxSkills)
 {
-	return nullptr;
+    Warrior* newWarrior = new Warrior(name, cls, atk, def, hp, maxSkills);
+
+    if (count >= capacity) {
+        expand();
+    }
+
+    warriors[count++] = newWarrior;
+    return newWarrior;
 }
+
+void Squad::expand()
+{
+    int quantity = capacity;
+    int nuevaCapacidad = capacity * 2;
+    Warrior** nuevoArray = new Warrior * [nuevaCapacidad];
+
+    for (int i = 0; i < quantity; i++) {
+        nuevoArray[i] = warriors[i];
+    }
+
+    for (int i = quantity; i < nuevaCapacidad; i++) {
+        nuevoArray[i] = nullptr;
+    }
+
+    delete[] warriors;
+
+    warriors = nuevoArray;
+    capacity = nuevaCapacidad;
+}
+
 
 bool Squad::dismiss(string name)
 {
-	return false;
-}
-
-float Squad::totalPower() const
-{
-    float total = 0.0f;
-
-    for (int i = 0; i < count; i++)
-    {
-        total += warriors[i]->getPower();
+    for (int i = 0; i < count; i++) {
+        if (warriors[i] && warriors[i]->getName() == name) {
+            delete warriors[i];
+            // shift left
+            for (int j = i; j < count - 1; j++) warriors[j] = warriors[j + 1];
+            warriors[count - 1] = nullptr;
+            count--;
+            return true;
+        }
     }
-
-    return total;
+    return false;
 }
 
 void Squad::showSquad() const
@@ -49,24 +75,60 @@ void Squad::showSquad() const
 
 int Squad::getCount() const
 {
-	return 0;
+    return count;
 }
 
 string Squad::getName() const
 {
-	return string();
+    return name;
 }
-
 Warrior** Squad::getByClass(string cls, int& resultCount) const
 {
-	return nullptr;
+    resultCount = 0;
+    for (int i = 0; i < count; i++) {
+        if (warriors[i] && warriors[i]->getClass() == cls) resultCount++;
+    }
+
+    if (resultCount == 0) return nullptr;
+
+    Warrior** result = new Warrior * [resultCount];
+    int idx = 0;
+    for (int i = 0; i < count; i++) {
+        if (warriors[i] && warriors[i]->getClass() == cls) {
+            result[idx++] = warriors[i];
+        }
+    }
+    return result;
 }
 
 void Squad::sortByPower()
 {
+    // Simple selection sort by power (descending)
+    for (int i = 0; i < count - 1; i++) {
+        int best = i;
+        for (int j = i + 1; j < count; j++) {
+            if (warriors[j] && warriors[best]) {
+                if (warriors[j]->getPower() > warriors[best]->getPower()) {
+                    best = j;
+                }
+            }
+            else if (warriors[j] && !warriors[best]) {
+                best = j;
+            }
+        }
+        if (best != i) {
+            Warrior* tmp = warriors[i];
+            warriors[i] = warriors[best];
+            warriors[best] = tmp;
+        }
+    }
 }
 
 string Squad::simulateBattle(const Squad& enemy) const
 {
-	return string();
+    float myPower = totalPower();
+    float enemyPower = enemy.totalPower();
+    if (myPower > enemyPower) return name;
+    if (enemyPower > myPower) return enemy.getName();
+    return string("Draw");
 }
