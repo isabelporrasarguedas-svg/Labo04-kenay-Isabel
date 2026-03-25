@@ -33,7 +33,19 @@ void Squad::expand()
     capacity = nuevaCapacidad;
 }
 
-
+Squad::Squad(string name, int capacity) : name(name), capacity(capacity) {
+    this->count = 0; // Inicializar en 0
+    this->warriors = new Warrior*[capacity]; // Crear el arreglo dinámico
+    for (int i = 0; i < capacity; i++) {
+        warriors[i] = nullptr; // Limpiar punteros
+    }
+}
+Squad::~Squad() {
+    for (int i = 0; i < count; i++) {
+        delete warriors[i]; // Borra cada guerrero
+    }
+    delete[] warriors; // Borra el arreglo de punteros
+}
 bool Squad::dismiss(string name)
 {
     for (int i = 0; i < count; i++) {
@@ -49,6 +61,15 @@ bool Squad::dismiss(string name)
     return false;
 }
 
+float Squad::totalPower() const {
+    float total = 0;
+    for (int i = 0; i < count; i++) {
+        if (warriors[i]) {
+            total += warriors[i]->getPower(); 
+        }
+    }
+    return total;
+}
 void Squad::showSquad() const
 
 {
